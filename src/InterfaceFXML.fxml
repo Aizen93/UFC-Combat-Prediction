@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.chart.StackedBarChart?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -10,29 +15,70 @@
 
 <AnchorPane id="AnchorPane" fx:id="mainAnchor" prefHeight="600.0" prefWidth="1122.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="InterfaceController">
    <children>
-      <SplitPane fx:id="splitPane" dividerPositions="0.6285714285714286" prefHeight="600.0" prefWidth="1000.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-        <items>
-          <AnchorPane fx:id="dataAnchor" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-               <children>
-                  <TableView fx:id="tableView" prefHeight="598.0" prefWidth="696.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                    <columns>
-                      <TableColumn fx:id="number" editable="false" prefWidth="139.2" style="-fx-alignment: CENTER;" text="Number" />
-                        <TableColumn fx:id="actual" editable="false" prefWidth="139.2" style="-fx-alignment: CENTER; -fx-background-opacity: 20;" text="Actual 0:A" />
-                        <TableColumn fx:id="predicted" editable="false" prefWidth="139.2" style="-fx-alignment: CENTER;" text="Predicted 0:A" />
-                        <TableColumn fx:id="error" editable="false" prefWidth="139.2" style="-fx-alignment: CENTER;" text="Error +/null" />
-                        <TableColumn fx:id="prediction" editable="false" prefWidth="139.2" style="-fx-alignment: CENTER;" text="Prediction %" />
-                    </columns>
-                  </TableView>
-               </children>
-            </AnchorPane>
-          <AnchorPane fx:id="overallPane" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-               <children>
-                  <PieChart fx:id="charts" layoutX="14.0" layoutY="54.0" prefHeight="339.0" prefWidth="386.0" title="Prediction" AnchorPane.bottomAnchor="205.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="54.0" />
-                  <TextFlow fx:id="textFlow" layoutX="43.0" layoutY="491.0" prefHeight="93.0" prefWidth="338.0" textAlignment="CENTER" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="43.0" AnchorPane.rightAnchor="32.0" />
-                  <Button fx:id="startButton" layoutX="70.0" layoutY="14.0" mnemonicParsing="false" onAction="#parseResult" prefHeight="25.0" prefWidth="285.0" text="Start Prediction" />
-               </children>
-            </AnchorPane>
-        </items>
-      </SplitPane>
+      <TabPane prefHeight="600.0" prefWidth="1122.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <tabs>
+            <Tab text="Classification Result">
+               <content>
+                  <AnchorPane fx:id="dataAnchorClassif" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <TextFlow fx:id="textFlowRes" prefHeight="571.0" prefWidth="689.0" style="-fx-border-color: white black white white;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="433.0" AnchorPane.topAnchor="0.0" />
+                        <StackedBarChart fx:id="stackedBarChart" layoutX="689.0" layoutY="132.0" prefHeight="400.0" prefWidth="417.0" AnchorPane.bottomAnchor="39.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="132.0">
+                          <xAxis>
+                            <CategoryAxis side="BOTTOM" />
+                          </xAxis>
+                          <yAxis>
+                            <NumberAxis side="LEFT" />
+                          </yAxis>
+                        </StackedBarChart>
+                        <Button layoutX="809.0" layoutY="2.0" mnemonicParsing="false" onAction="#loadDataSet" prefHeight="25.0" prefWidth="100.0" text="Load Data Set" AnchorPane.rightAnchor="213.0" AnchorPane.topAnchor="2.0" />
+                        <Button layoutX="945.0" layoutY="2.0" mnemonicParsing="false" onAction="#createModel" prefHeight="25.0" prefWidth="100.0" text="Create Model" AnchorPane.rightAnchor="77.0" AnchorPane.topAnchor="2.0" />
+                        <ProgressIndicator fx:id="bar" layoutX="891.0" layoutY="27.0" prefHeight="68.0" prefWidth="83.0" progress="0.0" visible="false" AnchorPane.rightAnchor="148.0" AnchorPane.topAnchor="27.0" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </Tab>
+          <Tab text="Graphs PieCHart">
+            <content>
+              <AnchorPane fx:id="overallPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <PieChart fx:id="charts" layoutX="272.0" layoutY="109.0" prefHeight="354.0" prefWidth="590.0" title="Prediction" AnchorPane.bottomAnchor="108.0" AnchorPane.leftAnchor="272.0" AnchorPane.rightAnchor="260.0" AnchorPane.topAnchor="109.0" />
+                        <TextFlow fx:id="textFlow" layoutX="43.0" layoutY="53.0" prefHeight="93.0" prefWidth="338.0" textAlignment="CENTER" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="43.0" AnchorPane.rightAnchor="32.0" />
+                        <Button fx:id="startButton" layoutX="390.0" layoutY="14.0" mnemonicParsing="false" onAction="#parseResult" prefHeight="25.0" prefWidth="353.0" text="Start Prediction" AnchorPane.leftAnchor="390.0" AnchorPane.rightAnchor="379.0" AnchorPane.topAnchor="14.0" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+          <Tab text="Prediction Result Data">
+            <content>
+              <AnchorPane fx:id="dataAnchor" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <TableView fx:id="tableView" prefHeight="598.0" prefWidth="696.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                          <columns>
+                            <TableColumn fx:id="number" editable="false" maxWidth="350.0" minWidth="50.0" prefWidth="224.4" style="-fx-alignment: CENTER;" text="Number" />
+                              <TableColumn fx:id="actual" editable="false" maxWidth="350.0" minWidth="50.0" prefWidth="224.4" style="-fx-alignment: CENTER; -fx-background-opacity: 20;" text="Actual 0:A" />
+                              <TableColumn fx:id="predicted" editable="false" maxWidth="350.0" minWidth="50.0" prefWidth="224.4" style="-fx-alignment: CENTER;" text="Predicted 0:A" />
+                              <TableColumn fx:id="error" editable="false" maxWidth="350.0" minWidth="50.0" prefWidth="224.4" style="-fx-alignment: CENTER;" text="Error +/null" />
+                              <TableColumn fx:id="prediction" editable="false" maxWidth="350.0" minWidth="50.0" prefWidth="224.4" style="-fx-alignment: CENTER;" text="Prediction %" />
+                          </columns>
+                        </TableView>
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+            <Tab text="General statistics">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <TableView fx:id="statTableView" prefHeight="572.0" prefWidth="1122.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                          <columns>
+                            <TableColumn fx:id="statColumn" prefWidth="1120.0" text="General Statistics calculated from the data set generated" />
+                          </columns>
+                        </TableView>
+                     </children>
+                  </AnchorPane>
+              </content>
+            </Tab>
+        </tabs>
+      </TabPane>
    </children>
 </AnchorPane>
