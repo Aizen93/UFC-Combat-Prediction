@@ -1,15 +1,18 @@
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.PieChart;
+import javafx.scene.chart.StackedBarChart;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableCell;
@@ -22,6 +25,16 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.concurrent.Task;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressIndicator;
+import weka.classifiers.evaluation.Evaluation;
+import weka.classifiers.trees.RandomForest;
+import weka.core.Instances;
+import weka.core.converters.ConverterUtils.DataSource;
 
 /**
  * FXML Controller class
@@ -31,7 +44,7 @@ import javafx.scene.text.TextFlow;
 public class InterfaceController implements Initializable {
     
     @FXML
-    AnchorPane mainAnchor, overallPane, dataAnchor;
+    AnchorPane mainAnchor, overallPane, dataAnchor, dataAnchorClassif;
     @FXML
     SplitPane splitPane;
     @FXML
@@ -39,19 +52,29 @@ public class InterfaceController implements Initializable {
     @FXML
     TableColumn<MatchPrediction, String> number, actual, predicted, error, prediction;
     @FXML
+    TableView<String> statTableView;
+    @FXML
+    TableColumn<String, String> statColumn;
+    @FXML
     PieChart charts;
     @FXML
-    TextFlow textFlow;
-    Text text1;
+    StackedBarChart stackedBarChart;
+    @FXML
+    ProgressIndicator bar;
+    @FXML
+    TextFlow textFlow, textFlowRes;
+    
+    Text text1, textModel;
     double nbrErrors, nbrLines, nbrCorrect;
+    Label caption = new Label("");
     
     private final ObservableList<MatchPrediction> matchPredictionModels = FXCollections.observableArrayList();
+    private final ObservableList<String> stats = FXCollections.observableArrayList();
     
     /**
      * Fills the Pie chart with predicted result
      */
     private void fillPieChart(){
-        System.out.println(nbrErrors + " " + nbrLines);
         double wrong = nbrErrors / nbrLines * 100.0;
         double correct = nbrCorrect / nbrLines * 100.0;
         ObservableList<PieChart.Data> pieChartData =
@@ -60,14 +83,11 @@ public class InterfaceController implements Initializable {
             new PieChart.Data("Correct Prediction", correct));
         charts.setData(pieChartData);
         
-        
-        final Label caption = new Label("");
         caption.setTextFill(Color.GREEN);
         caption.setStyle("-fx-font: 24 arial;");
-        overallPane.getChildren().add(caption);
         charts.getData().forEach((data) -> {
             data.getNode().addEventHandler(MouseEvent.MOUSE_PRESSED, (MouseEvent e) -> {
-                caption.setLayoutX(e.getSceneX() - dataAnchor.getWidth());
+                caption.setLayoutX(e.getSceneX());
                 caption.setLayoutY(e.getSceneY());
                 caption.setText(String.valueOf(data.getPieValue()) + "%");
             });
@@ -111,6 +131,7 @@ public class InterfaceController implements Initializable {
     @FXML
     private void parseResult(ActionEvent event) {
         nbrErrors = 0;
+        nbrCorrect = 0;
         nbrLines = -1;
         matchPredictionModels.clear();
         String csvFile = "src/ResultatPrédiction.csv";
@@ -155,10 +176,103 @@ public class InterfaceController implements Initializable {
         /*-------------------------PieChart-Tableview-------------------------*/
     }
     
+    @FXML
+    private void loadDataSet(ActionEvent event) {
+        
+    }
+    
+    @FXML
+    private void createModel(ActionEvent event) {
+        bar.setVisible(true);
+        Task task = new Task<Void>() {
+            @Override 
+            public Void call() {
+                int numFolds = 10;
+                DataSource source;
+                try {
+                    source = new DataSource("src/Csv/NewEnsembleSANSCOLONNENOM.csv");
+                    Instances data = source.getDataSet();
+                    // setting class attribute if the data format does not provide this information
+                    // For example, the XRFF format saves the class attribute information as well
+                    if (data.classIndex() == -1) data.setClassIndex(data.numAttributes() - 1);
+                    //System.out.println(data);
+                    data.setClassIndex(data.numAttributes() - 1);
+                    RandomForest rf = new RandomForest();
+                    rf.setNumFeatures(0);
+                    rf.setBagSizePercent(100);
+                    rf.setNumExecutionSlots(1);
+                    rf.setMaxDepth(0);
+                    rf.setNumDecimalPlaces(2);
+                    
+                    //   rf.buildClassifier(trainData);
+                    Evaluation evaluation = new Evaluation(data);
+                    evaluation.crossValidateModel(rf, data, numFolds, new Random(1));
+                    
+                    textModel.setText(evaluation.toSummaryString("\nResults\n======\n", true) +
+                        "\n" + evaluation.toClassDetailsString() +
+                        "\n" + "Results For Class -1- " + 
+                        "\n" + "Precision=  " + evaluation.precision(0) +
+                        "\n" + "Recall=  " + evaluation.recall(0) +
+                        "\n" + "F-measure=  " + evaluation.fMeasure(0) +
+                        "\n" + "Results For Class -2- " +
+                        "\n" + "Precision=  " + evaluation.precision(1) +
+                        "\n" + "Recall=  " + evaluation.recall(1) +
+                        "\n" + "F-measure=  " + evaluation.fMeasure(1));
+                    textModel.setFill(Color.BLACK); 
+                    textModel.setFont(Font.font("Verdana", 12));
+                    
+                } catch (Exception ex) {
+                    Logger.getLogger(InterfaceController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+                succeeded();
+                bar.setVisible(false);
+                return null;
+            }
+        };
+        bar.progressProperty().bind(task.progressProperty());
+        new Thread(task).start();
+        
+    }
+    
+    private void fillStats(){
+        File f= new File("src/Csv/NewEnsemble.csv");
+        Statistique stat = new Statistique(f);
+        
+        stats.add(stat.stat1(32));
+        stats.add(stat.stat2(4));
+        stats.add(stat.stat3(4));
+        String[] tmp = stat.stat4(33, 0.50);
+        stats.add(tmp[0]);
+        stats.add(tmp[1]);
+        stats.add(tmp[2]);
+        stats.add(stat.stat5());
+        stats.add(stat.stat7());
+        stats.add(stat.stat8());
+        tmp = stat.stat9();
+        stats.add(tmp[0]);
+        stats.add(tmp[1]);
+        stats.add(tmp[2]);
+        tmp = stat.stat10();
+        stats.add(tmp[0]);
+        stats.add(tmp[1]);
+        stats.add(tmp[2]);
+        
+        statColumn.setCellValueFactory(cellData -> {
+            return new ReadOnlyStringWrapper(cellData.getValue());
+        });
+        statTableView.setItems(stats);
+    }
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         text1 = new Text();
+        textModel = new Text();
         textFlow.getChildren().add(text1);
+        textFlowRes.getChildren().add(textModel);
+        overallPane.getChildren().add(caption);
+        
+        fillStats();
         /*PauseTransition delay = new PauseTransition(Duration.millis(1000));
         delay.setOnFinished(event -> {
         //code here
