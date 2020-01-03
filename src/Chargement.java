@@ -654,24 +654,6 @@ public class Chargement {
 	    		            
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-
 	public int NbMatch(int j, String nom){
 		int res=0;
 		for(int i=0; i<j; i++)

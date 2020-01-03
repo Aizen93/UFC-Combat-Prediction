@@ -10,10 +10,12 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.TextFlow?>
 
-<AnchorPane id="AnchorPane" fx:id="mainAnchor" prefHeight="600.0" prefWidth="1122.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="InterfaceController">
+<AnchorPane id="AnchorPane" fx:id="mainAnchor" prefHeight="600.0" prefWidth="1122.0" stylesheets="@Csv/style.css" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="InterfaceController">
    <children>
       <TabPane prefHeight="600.0" prefWidth="1122.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <tabs>
@@ -24,10 +26,10 @@
                         <TextFlow fx:id="textFlowRes" prefHeight="571.0" prefWidth="689.0" style="-fx-border-color: white black white white;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="433.0" AnchorPane.topAnchor="0.0" />
                         <StackedBarChart fx:id="stackedBarChart" layoutX="689.0" layoutY="132.0" prefHeight="400.0" prefWidth="417.0" AnchorPane.bottomAnchor="39.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="132.0">
                           <xAxis>
-                            <CategoryAxis side="BOTTOM" />
+                            <CategoryAxis side="BOTTOM" fx:id="xAxis" />
                           </xAxis>
                           <yAxis>
-                            <NumberAxis side="LEFT" />
+                            <NumberAxis fx:id="yAxis" side="LEFT" />
                           </yAxis>
                         </StackedBarChart>
                         <Button layoutX="809.0" layoutY="2.0" mnemonicParsing="false" onAction="#loadDataSet" prefHeight="25.0" prefWidth="100.0" text="Load Data Set" AnchorPane.rightAnchor="213.0" AnchorPane.topAnchor="2.0" />
@@ -37,10 +39,15 @@
                   </AnchorPane>
                </content>
             </Tab>
-          <Tab text="Graphs PieCHart">
+          <Tab text="Graphs PieChart">
             <content>
               <AnchorPane fx:id="overallPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
+                        <ImageView fitHeight="572.0" fitWidth="1122.0" pickOnBounds="true" AnchorPane.bottomAnchor="-1.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <image>
+                              <Image url="@Csv/1281757.jpg" />
+                           </image>
+                        </ImageView>
                         <PieChart fx:id="charts" layoutX="272.0" layoutY="109.0" prefHeight="354.0" prefWidth="590.0" title="Prediction" AnchorPane.bottomAnchor="108.0" AnchorPane.leftAnchor="272.0" AnchorPane.rightAnchor="260.0" AnchorPane.topAnchor="109.0" />
                         <TextFlow fx:id="textFlow" layoutX="43.0" layoutY="53.0" prefHeight="93.0" prefWidth="338.0" textAlignment="CENTER" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="43.0" AnchorPane.rightAnchor="32.0" />
                         <Button fx:id="startButton" layoutX="390.0" layoutY="14.0" mnemonicParsing="false" onAction="#parseResult" prefHeight="25.0" prefWidth="353.0" text="Start Prediction" AnchorPane.leftAnchor="390.0" AnchorPane.rightAnchor="379.0" AnchorPane.topAnchor="14.0" />
@@ -52,10 +59,15 @@
             <content>
               <AnchorPane fx:id="dataAnchor" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <TableView fx:id="tableView" prefHeight="598.0" prefWidth="696.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <ImageView fitHeight="571.0" fitWidth="1122.0" pickOnBounds="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <image>
+                              <Image url="@Csv/23-232100_blood-wallpaper-4k.jpg" />
+                           </image>
+                        </ImageView>
+                        <TableView fx:id="tableView" prefHeight="598.0" prefWidth="696.0" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                           <columns>
                             <TableColumn fx:id="number" editable="false" maxWidth="350.0" minWidth="50.0" prefWidth="224.4" style="-fx-alignment: CENTER;" text="Number" />
-                              <TableColumn fx:id="actual" editable="false" maxWidth="350.0" minWidth="50.0" prefWidth="224.4" style="-fx-alignment: CENTER; -fx-background-opacity: 20;" text="Actual 0:A" />
+                              <TableColumn fx:id="actual" editable="false" maxWidth="350.0" minWidth="50.0" prefWidth="224.4" style="-fx-alignment: CENTER;" text="Actual 0:A" />
                               <TableColumn fx:id="predicted" editable="false" maxWidth="350.0" minWidth="50.0" prefWidth="224.4" style="-fx-alignment: CENTER;" text="Predicted 0:A" />
                               <TableColumn fx:id="error" editable="false" maxWidth="350.0" minWidth="50.0" prefWidth="224.4" style="-fx-alignment: CENTER;" text="Error +/null" />
                               <TableColumn fx:id="prediction" editable="false" maxWidth="350.0" minWidth="50.0" prefWidth="224.4" style="-fx-alignment: CENTER;" text="Prediction %" />

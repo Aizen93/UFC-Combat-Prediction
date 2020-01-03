@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.ResourceBundle;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
@@ -28,8 +29,11 @@ import javafx.scene.text.TextFlow;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.scene.control.ProgressBar;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.ProgressIndicator;
 import weka.classifiers.evaluation.Evaluation;
 import weka.classifiers.trees.RandomForest;
@@ -58,7 +62,11 @@ public class InterfaceController implements Initializable {
     @FXML
     PieChart charts;
     @FXML
-    StackedBarChart stackedBarChart;
+    StackedBarChart<String, Number> stackedBarChart;
+    @FXML
+    CategoryAxis xAxis;
+    @FXML
+    NumberAxis yAxis;
     @FXML
     ProgressIndicator bar;
     @FXML
@@ -189,8 +197,9 @@ public class InterfaceController implements Initializable {
             public Void call() {
                 int numFolds = 10;
                 DataSource source;
+                ClassDetails cd1, cd2;
                 try {
-                    source = new DataSource("src/Csv/NewEnsembleSANSCOLONNENOM.csv");
+                    source = new DataSource("src/Csv/Oussama.csv");
                     Instances data = source.getDataSet();
                     // setting class attribute if the data format does not provide this information
                     // For example, the XRFF format saves the class attribute information as well
@@ -208,23 +217,54 @@ public class InterfaceController implements Initializable {
                     Evaluation evaluation = new Evaluation(data);
                     evaluation.crossValidateModel(rf, data, numFolds, new Random(1));
                     
-                    textModel.setText(evaluation.toSummaryString("\nResults\n======\n", true) +
-                        "\n" + evaluation.toClassDetailsString() +
-                        "\n" + "Results For Class -1- " + 
-                        "\n" + "Precision=  " + evaluation.precision(0) +
-                        "\n" + "Recall=  " + evaluation.recall(0) +
-                        "\n" + "F-measure=  " + evaluation.fMeasure(0) +
-                        "\n" + "Results For Class -2- " +
-                        "\n" + "Precision=  " + evaluation.precision(1) +
-                        "\n" + "Recall=  " + evaluation.recall(1) +
-                        "\n" + "F-measure=  " + evaluation.fMeasure(1));
-                    textModel.setFill(Color.BLACK); 
-                    textModel.setFont(Font.font("Verdana", 12));
-                    
+                    cd1 = new ClassDetails(evaluation.precision(0), evaluation.recall(0), evaluation.fMeasure(0));
+                    cd2 = new ClassDetails(evaluation.precision(1), evaluation.recall(1), evaluation.fMeasure(1));
+                    Platform.runLater(() -> {
+                        try {
+                            textModel.setText(evaluation.toSummaryString("\nResults\n======\n", true) +
+                                "\n" + evaluation.toClassDetailsString() +
+                                "\n" + "Results For Class -1- " +
+                                        "\n" + "Precision=  " + cd1.getPrecision() +
+                                "\n" + "Recall=  " + cd1.getRecall() +
+                                "\n" + "F-measure=  " + cd1.getF_measure() +
+                                "\n" + "Results For Class -2- " +
+                                        "\n" + "Precision=  " + cd2.getPrecision() +
+                                "\n" + "Recall=  " + cd2.getRecall() +
+                                "\n" + "F-measure=  " + cd2.getF_measure());
+                        }catch (Exception ex) {
+                            Logger.getLogger(InterfaceController.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        textModel.setFill(Color.BLACK);
+                        textModel.setFont(Font.font("Verdana", 12));
+                        
+                        xAxis.setCategories(FXCollections.<String>observableArrayList(Arrays.asList
+                            ("Precision", "Recall", "F-Measure")));
+                        xAxis.setLabel("Category");
+                        yAxis.setLabel("Percentage (in %)");
+                        
+                        stackedBarChart.setTitle("Historic Percentage (Precision, Recall and F-Measure)");
+                        XYChart.Series<String, Number> series1 = new XYChart.Series<>();
+                        series1.setName("Class-1-");
+                        series1.getData().add(new XYChart.Data<>("Precision", cd1.getPrecision() * 100)); 
+                        series1.getData().add(new XYChart.Data<>("Recall", cd1.getRecall() * 100)); 
+                        series1.getData().add(new XYChart.Data<>("F-Measure", cd1.getF_measure() * 100));
+
+                        XYChart.Series<String, Number> series2 = new XYChart.Series<>();
+                        series2.setName("Class-2-");
+                        series2.getData().add(new XYChart.Data<>("Precision", Math.abs(cd2.getPrecision() - cd1.getPrecision()) * 100)); 
+                        series2.getData().add(new XYChart.Data<>("Recall", Math.abs(cd2.getRecall() - cd1.getRecall()) * 100));
+                        series2.getData().add(new XYChart.Data<>("F-Measure", Math.abs(cd2.getF_measure() - cd1.getF_measure()) * 100));
+
+                        //stackedBarChart.getData().addAll(series1, series2);
+                        ObservableList<XYChart.Series<String, Number>> ob = FXCollections.observableArrayList();
+                        ob.add(series1);
+                        ob.add(series2);
+                        stackedBarChart.setData(ob);
+                    });
+                
                 } catch (Exception ex) {
                     Logger.getLogger(InterfaceController.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                
                 succeeded();
                 bar.setVisible(false);
                 return null;

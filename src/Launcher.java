@@ -6,7 +6,7 @@ import javafx.stage.Stage;
 
 /**
  *
- * @author Oussama, achraf & Elouiza
+ * @author Oussama, Ilyess
  */
 public class Launcher extends Application {
     
