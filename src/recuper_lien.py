@@ -6,7 +6,7 @@ import urllib.request
 import os 
 os.chdir('csv')
 
-with urllib.request.urlopen('http://www.fightmetric.com/statistics/events/completed?page=all') as sock:
+with urllib.request.urlopen('http://ufcstats.com/statistics/events/completed?page=all') as sock:
 	page=sock.read()
 	soup=BeautifulSoup(page)
 
@@ -19,6 +19,7 @@ for e in trs:
 		event_lien.append(lien.get('href'))
 
 fight_lien=[]
+fighter_lien=[]
 date=[]
 for lien_url in event_lien:
 	print(lien_url)
@@ -31,6 +32,8 @@ for lien_url in event_lien:
 
 		tds=beautisoup.find_all('td')
 		lis=beautisoup.find_all('li')
+		
+		#print(lis)
 		for balise_td in tds:
 			for lien in balise_td.find_all('a'):
 				url=lien.get('href')
@@ -41,8 +44,11 @@ for lien_url in event_lien:
 					#Il ya 2 types de liens les liens qui mene au detail du combat , et les liens qui menne au differents commbattant qui participe au combats
 					if type_url =='ht': #Le lien reccuperer et de la forme ....fight|fighter donc on a spliter le lien et on test la fin du lien , si sa fini par "er"alors on recupere le lien qui mene au commbattant si cest "ht" on recupere le lien du combat
 						fight_lien.append(url)
-						date.append((lis[8].getText().split()[1] +lis[8].getText().split()[2]+lis[8].getText().split()[3]))
-
+						date.append((lis[3].getText().split()[1] +lis[3].getText().split()[2]+lis[3].getText().split()[3]))
+					else:
+						fighter_lien.append(url)
+						
+						
 
 	except (HTTPError,URLError):
 		pass
@@ -52,4 +58,6 @@ csv_lien_fight=panda.DataFrame(fight_lien,columns=['link'])
 datee=panda.DataFrame(date,columns=['date'])
 finale =panda.concat([csv_lien_fight,datee],axis=1)
 finale.to_csv('liste_combat.csv',index=False)
-#csv_lien_fight.to_csv('liste_combattant.csv',index=False)
+
+csv_lien_fighter = panda.DataFrame(fighter_lien, columns=['link'])
+csv_lien_fighter.to_csv('liste_combattant.csv',index=False)
