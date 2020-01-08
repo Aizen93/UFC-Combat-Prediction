@@ -3,19 +3,17 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 
-
 public class Statistique {
 
-    private ArrayList<Combatsortiebis> listesortiebis=new ArrayList<>();
+    private ArrayList<Combatsortiebis> listesortiebis = new ArrayList<>();
 
     public Statistique(File f1){
-        BufferedReader fileReader1=null;
-
+        BufferedReader fileReader1;
         try{
-            String line ="";                                     
+            String line;                                     
             fileReader1 = new BufferedReader(new FileReader(f1));
             fileReader1.readLine();
-            while((line=fileReader1.readLine())!= null){
+            while((line = fileReader1.readLine())!= null){
                 String []tokens = line.split(",");
                 if(tokens.length > 0){
                     Combatsortiebis csb = new Combatsortiebis(tokens[0],Integer.parseInt(tokens[1]),Double.parseDouble(tokens[2]),Integer.parseInt(tokens[3]),Integer.parseInt(tokens[4]),Integer.parseInt(tokens[5]),
@@ -233,5 +231,4 @@ public class Statistique {
             ("Si un combattant a un pourcentage de victoire par soumission superieur au pourcentage de defaite par soumission de son adversaire il aura "+ sub/subt +" % de gagner")
         };
     }
-
 }
