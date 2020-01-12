@@ -10,8 +10,8 @@ lien_combattant=panda.read_csv('liste_combattant.csv',encoding='utf-8')
 
 #creation d'une dataFrame
 combattant_df = panda.DataFrame(columns=['name', 'height', 'reach', 'age'])
-
-for i,row in lien_combattant.iterrows():
+cpt = 0
+for i, row in lien_combattant.iterrows():
 	combattant_dict={}
 	dict_n={}
 	try:
@@ -25,39 +25,47 @@ for i,row in lien_combattant.iterrows():
 			li=n[0].get_text().split()
 		
 		try: 
-			year = int(str(h[12].get_text().split()[-1]))
+			year = int(str(h[7].get_text().split()[-1]))
 		except:
 			year = 0
 			erreur +=1
 		try:
-			reach = float(str(h[10].get_text()).split()[1][:2])
+			reach = float(str(h[5].get_text()).split()[1][:2])
 		except:
 			reach = None
 			erreur +=1
 		try:
-			height = str(h[8].get_text().split()[1])+(str(h[8].get_text().split()[2]))
+			feet = str(h[3].get_text().split()[1])
+			feet_to_cm = float(feet[0])*30.48
+			inches = str(h[3].get_text().split()[2])
+			inches_to_cm = float(inches[0])*2.54
+			height = str(int(feet_to_cm+inches_to_cm))
 		except:
 			height = None
 			erreur +=1
 		
 		try: 
 			name = ' '.join(map(str, li))
+			if name not in dict_n :
+				dict_n[name] = 0
+			else :
+				dict_n[name]= dict_n[name] +1
+				print("key dict_n ===== ",dict_n[name])
 			print(name)
 		except:
 			name = None
 			erreur +=1
 	except (HTTPError,URLError):
 		pass 
-
-	combattant_dict={'name': name, 'height': height, 'reach': reach, 'age': 2016 - year}
+	
+	combattant_dict={'name': name, 'height': height, 'reach': reach, 'age': 2020 - year}
 	print(combattant_dict)
-	if name not in dict_n:
-		dict_n[name]=0
+	if dict_n[name] == 0:
 		print("ok")
+		dict_n[name]= dict_n[name] +1
 		combattant_df = combattant_df.append(combattant_dict, ignore_index=True)
-	combattant_df.to_csv('fighterFINAL.csv',index=False)
+		combattant_df.to_csv('fighterFINAL.csv',index=False)
 
-
-
-
-
+	cpt = cpt + 1
+	if cpt == 350 :
+		break
