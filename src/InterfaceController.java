@@ -42,7 +42,7 @@ import weka.core.converters.ConverterUtils.DataSource;
 
 /**
  * FXML Controller class
- * Control l'interface graphique et tous ses composents
+ * Controle l'interface graphique et tous ses composents
  * @author Oussama, Ilyess
  */
 public class InterfaceController implements Initializable {
@@ -199,13 +199,11 @@ public class InterfaceController implements Initializable {
                 DataSource source;
                 ClassDetails cd1, cd2;
                 try {
-                    source = new DataSource("src/Csv/Oussama.csv");
+                    source = new DataSource("src/Csv/NewEnsembleSANSCOLONNENOM.csv");
                     Instances data = source.getDataSet();
                     // setting class attribute if the data format does not provide this information
                     // For example, the XRFF format saves the class attribute information as well
                     if (data.classIndex() == -1) data.setClassIndex(data.numAttributes() - 1);
-                    //System.out.println(data);
-                    data.setClassIndex(data.numAttributes() - 1);
                     RandomForest rf = new RandomForest();
                     rf.setNumFeatures(0);
                     rf.setBagSizePercent(100);
@@ -224,11 +222,11 @@ public class InterfaceController implements Initializable {
                             textModel.setText(evaluation.toSummaryString("\nResults\n======\n", true) +
                                 "\n" + evaluation.toClassDetailsString() +
                                 "\n" + "Results For Class -1- " +
-                                        "\n" + "Precision=  " + cd1.getPrecision() +
+                                "\n" + "Precision=  " + cd1.getPrecision() +
                                 "\n" + "Recall=  " + cd1.getRecall() +
                                 "\n" + "F-measure=  " + cd1.getF_measure() +
                                 "\n" + "Results For Class -2- " +
-                                        "\n" + "Precision=  " + cd2.getPrecision() +
+                                "\n" + "Precision=  " + cd2.getPrecision() +
                                 "\n" + "Recall=  " + cd2.getRecall() +
                                 "\n" + "F-measure=  " + cd2.getF_measure());
                         }catch (Exception ex) {
